@@ -53,6 +53,8 @@ class FiltersChannels(StatesGroup):
 
 @dp.message(CommandStart())
 async def cmd_start(message: types.Message):
+    if message.from_user.id not in [192659790, 6264939461]:
+        return
     await message.answer(text="Основное меню", reply_markup = await main_kb())
     
 
