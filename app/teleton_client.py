@@ -24,6 +24,12 @@ from telethon.tl.types import PeerChannel
 import pymorphy2
 from telethon.errors import UsernameInvalidError, ChannelInvalidError
 
+from telethon.tl.functions.contacts import ResolveUsername
+from telethon.tl.functions.channels import GetFullChannel
+from telethon.tl.types import PeerChannel, InputPeerChannel
+from telethon.errors import UsernameNotOccupiedError, ChannelInvalidError
+from telethon.tl.functions.channels import JoinChannelRequest
+
 async def get_channel_info(channel_id_or_name, client, phone_number):
     await client.start(phone=phone_number)
     try:
@@ -46,6 +52,12 @@ async def get_channel_info(channel_id_or_name, client, phone_number):
                     else:
                         return f"-100{dialog.entity.id}"
             return False
+    except (UsernameNotOccupiedError, ChannelInvalidError):
+        return False
+    except Exception as e:
+        print(f"[ERROR] {e}")
+        return False
+
 
 async def leave_channel_listening(channel_id, client, phone_number):
     await client.start(phone=phone_number)
