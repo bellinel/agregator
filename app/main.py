@@ -13,7 +13,7 @@ from db import (
     get_all_filters,
     remove_filter
 )
-
+from telethon.tl.types import Channel, Chat, User
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, CallbackQuery, ReplyKeyboardRemove
 from aiogram.fsm.state import StatesGroup, State
@@ -264,7 +264,22 @@ async def register_handler():
     current_handler = new_channel_message_handler
     print(f"✅ Новый обработчик событий зарегистрирован для {len(CHANNELS)} каналов")
 
+async def list_all_dialogs():
+    await telethon_client.start(phone=PHONE_NUMBER)
 
+    async for dialog in telethon_client.iter_dialogs():
+        entity = dialog.entity
+
+        if isinstance(entity, Channel):
+            kind = 'Канал'
+        elif isinstance(entity, Chat):
+            kind = 'Группа'
+        elif isinstance(entity, User):
+            kind = 'Пользователь'
+        else:
+            kind = 'Другое'
+
+        print(f"{kind}: {dialog.name} — ID: {entity.id}")
 
 
 
@@ -281,6 +296,7 @@ async def update_channels_and_restart_handler(new_channels):
 async def main():
     await init_db()
     await telethon_client.start(phone=PHONE_NUMBER)
+    await list_all_dialogs()
     channels = await get_all_channels()
     channels = [channel.channel_id for channel in channels]
     print(channels)
