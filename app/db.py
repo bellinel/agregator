@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, select
 
 # PostgreSQL подключение (обнови логин/пароль при необходимости)
-DATABASE_URL = "postgresql+asyncpg://username:password@localhost:5432/your_database"
+DATABASE_URL = "postgresql+asyncpg://nikitka:123456@localhost:5432/basa2"
 async_engine = create_async_engine(DATABASE_URL, echo=False)
 
 AsyncSessionLocal = sessionmaker(
