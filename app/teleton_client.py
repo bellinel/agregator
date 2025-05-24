@@ -26,24 +26,25 @@ from telethon.errors import UsernameInvalidError, ChannelInvalidError
 
 async def get_channel_info(channel_id_or_name, client, phone_number):
     await client.start(phone=phone_number)
-    channel_id_or_name = str(channel_id_or_name)
-    if channel_id_or_name.startswith("@"):
-        try:
-            channel = channel_id_or_name[1:]
-            channel = await client.get_entity((channel_id_or_name))
+    try:
+        # Если это username
+        if isinstance(channel_id_or_name, str) and channel_id_or_name.startswith("@"):
+            username = channel_id_or_name[1:]
+            result = await client(ResolveUsername(username))
+            channel = result.chats[0]
             await client(JoinChannelRequest(channel))
-            channel_id = f"-100{channel.id}"
-            return channel_id
-        except:
-            return False
-    else:
-        try:
-            channel_id_or_name = int(channel_id_or_name)
-            channel = await client.get_entity(PeerChannel(channel_id_or_name))
-            await client(JoinChannelRequest(channel))
-            channel_username = f'@{channel.username}'
-            return channel_username
-        except:
+            return f"-100{channel.id}"
+        
+        # Если это ID
+        elif str(channel_id_or_name).startswith("-100") or str(channel_id_or_name).isdigit():
+            channel_id = int(str(channel_id_or_name).replace("-100", ""))
+            dialogs = await client.get_dialogs()
+            for dialog in dialogs:
+                if getattr(dialog.entity, "id", None) == channel_id:
+                    if hasattr(dialog.entity, 'username'):
+                        return f"@{dialog.entity.username}"
+                    else:
+                        return f"-100{dialog.entity.id}"
             return False
 
 async def leave_channel_listening(channel_id, client, phone_number):
