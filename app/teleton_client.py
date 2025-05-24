@@ -1,6 +1,7 @@
 import inspect
 import functools
 from collections import namedtuple
+from telethon.errors import UserAlreadyParticipantError
 
 ArgSpec = namedtuple('ArgSpec', ['args', 'varargs', 'keywords', 'defaults'])
 
