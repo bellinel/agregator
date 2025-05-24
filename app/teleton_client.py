@@ -56,9 +56,13 @@ async def leave_channel_listening(channel_id, client, phone_number):
     await client.start(phone=phone_number)
     
     channel_id = int(channel_id)
-    channel = await client.get_entity(PeerChannel(channel_id))
-    await client(LeaveChannelRequest(channel))
-
+    try:
+        channel = await client.get_entity(PeerChannel(channel_id))
+        await client(LeaveChannelRequest(channel))
+    except Exception as e:
+        print(f"❌ Ошибка при выходе: {e}")
+        
+ 
 
 async def generate_all_case_forms(phrase):
     morph = pymorphy2.MorphAnalyzer()
