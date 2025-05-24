@@ -39,15 +39,17 @@ async def get_channel_info(channel_id_or_name, client, phone_number):
             await client(JoinChannelRequest(entity))
             return f"-100{entity.id}"
 
-        # Если это ID
+        # Если это числовой channel_id
         else:
-            channel_id = int(str(channel_id_or_name).replace("-100", ""))
-            entity = await client.get_entity(PeerChannel(channel_id))
+            # Важно: нужно получить entity через get_entity(f"-100{id}")
+            channel_str = f"-100{int(channel_id_or_name)}"
+            entity = await client.get_entity(channel_str)
             await client(JoinChannelRequest(entity))
             if hasattr(entity, 'username') and entity.username:
                 return f"@{entity.username}"
             return f"-100{entity.id}"
-    except (UsernameNotOccupiedError, ChannelInvalidError):
+
+    except (UsernameNotOccupiedError, ChannelInvalidError, ChannelPrivateError):
         return False
     except Exception as e:
         print(f"[ERROR]: {e}")
