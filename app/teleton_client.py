@@ -35,28 +35,24 @@ async def get_channel_info(channel_id_or_name, client, phone_number):
     try:
         # Если это username
         if isinstance(channel_id_or_name, str) and channel_id_or_name.startswith("@"):
-            username = channel_id_or_name[1:]
-            result = await client(ResolveUsername(username))
-            channel = result.chats[0]
-            await client(JoinChannelRequest(channel))
-            return f"-100{channel.id}"
-        
+            entity = await client.get_entity(channel_id_or_name)
+            await client(JoinChannelRequest(entity))
+            return f"-100{entity.id}"
+
         # Если это ID
-        elif str(channel_id_or_name).startswith("-100") or str(channel_id_or_name).isdigit():
+        else:
             channel_id = int(str(channel_id_or_name).replace("-100", ""))
-            dialogs = await client.get_dialogs()
-            for dialog in dialogs:
-                if getattr(dialog.entity, "id", None) == channel_id:
-                    if hasattr(dialog.entity, 'username'):
-                        return f"@{dialog.entity.username}"
-                    else:
-                        return f"-100{dialog.entity.id}"
-            return False
+            entity = await client.get_entity(PeerChannel(channel_id))
+            await client(JoinChannelRequest(entity))
+            if hasattr(entity, 'username') and entity.username:
+                return f"@{entity.username}"
+            return f"-100{entity.id}"
     except (UsernameNotOccupiedError, ChannelInvalidError):
         return False
     except Exception as e:
-        print(f"[ERROR] {e}")
+        print(f"[ERROR]: {e}")
         return False
+      
 
 
 async def leave_channel_listening(channel_id, client, phone_number):
