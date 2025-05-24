@@ -34,8 +34,11 @@ async def get_channel_info(channel_id_or_name, client, phone_number):
             await client(JoinChannelRequest(channel))
             channel_id = f"-100{channel.id}"
             return channel_id
-        except:
-            return False
+        
+        except UserAlreadyParticipantError:
+            print(f"ℹ️ Уже подписан на канал: {entity.title}")
+        except Exception as e:
+            print(f"❌ Ошибка при подписке: {e}")
     else:
         try:
             channel_id_or_name = int(channel_id_or_name)
@@ -43,8 +46,10 @@ async def get_channel_info(channel_id_or_name, client, phone_number):
             await client(JoinChannelRequest(channel))
             channel_username = f'@{channel.username}'
             return channel_username
-        except:
-            return False
+        except UserAlreadyParticipantError:
+            print(f"ℹ️ Уже подписан на канал: {entity.title}")
+        except Exception as e:
+            print(f"❌ Ошибка при подписке: {e}")
 
 async def leave_channel_listening(channel_id, client, phone_number):
     await client.start(phone=phone_number)
