@@ -33,7 +33,7 @@ class Channel(Base):
     __tablename__ = 'channels'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    channel_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    channel_id: Mapped[int] = mapped_column(Integer, nullable=False)
     channel_name: Mapped[str] = mapped_column(String, nullable=True)
 
 # Модель Filter
