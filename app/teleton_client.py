@@ -24,38 +24,27 @@ from telethon.tl.types import PeerChannel
 import pymorphy2
 from telethon.errors import UsernameInvalidError, ChannelInvalidError
 
-
-
-from telethon.tl.types import PeerChannel, InputPeerChannel
-from telethon.errors import UsernameNotOccupiedError, ChannelInvalidError
-from telethon.tl.functions.channels import JoinChannelRequest
-
 async def get_channel_info(channel_id_or_name, client, phone_number):
     await client.start(phone=phone_number)
-    try:
-        # Если это username
-        if isinstance(channel_id_or_name, str) and channel_id_or_name.startswith("@"):
-            entity = await client.get_entity(channel_id_or_name)
-            await client(JoinChannelRequest(entity))
-            return f"-100{entity.id}"
-
-        # Если это числовой channel_id
-        else:
-            # Важно: нужно получить entity через get_entity(f"-100{id}")
-            channel_str = f"-100{int(channel_id_or_name)}"
-            entity = await client.get_entity(channel_str)
-            await client(JoinChannelRequest(entity))
-            if hasattr(entity, 'username') and entity.username:
-                return f"@{entity.username}"
-            return f"-100{entity.id}"
-
-    except (UsernameNotOccupiedError, ChannelInvalidError, ChannelPrivateError):
-        return False
-    except Exception as e:
-        print(f"[ERROR]: {e}")
-        return False
-      
-
+    channel_id_or_name = str(channel_id_or_name)
+    if channel_id_or_name.startswith("@"):
+        try:
+            channel = channel_id_or_name[1:]
+            channel = await client.get_entity((channel_id_or_name))
+            await client(JoinChannelRequest(channel))
+            channel_id = f"-100{channel.id}"
+            return channel_id
+        except:
+            return False
+    else:
+        try:
+            channel_id_or_name = int(channel_id_or_name)
+            channel = await client.get_entity(PeerChannel(channel_id_or_name))
+            await client(JoinChannelRequest(channel))
+            channel_username = f'@{channel.username}'
+            return channel_username
+        except:
+            return False
 
 async def leave_channel_listening(channel_id, client, phone_number):
     await client.start(phone=phone_number)
@@ -163,3 +152,4 @@ async def message_to_html_safe(message):
         text_chars.insert(index, tag)
 
     return html.escape("".join(text_chars), quote=False).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+
