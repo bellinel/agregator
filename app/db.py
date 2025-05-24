@@ -33,7 +33,7 @@ class Channel(Base):
     __tablename__ = 'channels'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    channel_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    channel_id: Mapped[int] = mapped_column(String, nullable=False)
     channel_name: Mapped[str] = mapped_column(String, nullable=True)
 
 # Модель Filter
@@ -49,7 +49,7 @@ async def init_db():
         await conn.run_sync(Base.metadata.create_all)
 
 # Добавить канал
-async def add_channel(channel_name: str, channel_id: int):
+async def add_channel(channel_name: str, channel_id: str):
     async with AsyncSessionLocal() as session:
         query = select(Channel).where(Channel.channel_id == channel_id)
         result = await session.execute(query)
