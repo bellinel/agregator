@@ -24,7 +24,7 @@ from telethon.tl.types import PeerChannel
 import pymorphy2
 from telethon.errors import UsernameInvalidError, ChannelInvalidError
 
-from telethon.tl.functions.contacts import ResolveUsername
+
 from telethon.tl.functions.channels import GetFullChannel
 from telethon.tl.types import PeerChannel, InputPeerChannel
 from telethon.errors import UsernameNotOccupiedError, ChannelInvalidError
